@@ -1,0 +1,23 @@
+{
+  "name": "preview-select",
+  "version": "0.1.0",
+  "description": "预览视图",
+  "main": "lib/preview-select.js",
+  "types": "lib/preview-select.d.ts",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "build:ts": "rm -rf lib && tsc -w",
+    "build:web": "rollup -c --watch"
+  },
+  "keywords": ["preview"],
+  "author": "Ajanuw",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript": "^1.0.1",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
+  }
+}
