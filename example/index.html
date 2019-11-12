@@ -57,9 +57,11 @@
     <script src="../dist/preview-select.js"></script>
     <script>
       const { PreviewSelect } = previewSelect;
-      new PreviewSelect({ select: "img" }).to({
+      new PreviewSelect({ select: "img" })
+      .to({
         "border-radius": "20px",
-        transform: "scale(1.1) rotate(-30deg)"
+        transform: "scale(1.1) rotate(-30deg)",
+        width: '20%',
       });
     </script>
   </body>

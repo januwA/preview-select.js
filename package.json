@@ -1,5 +1,5 @@
 {
-  "name": "preview-select",
+  "name": "ajanuw-preview-select",
   "version": "0.1.0",
   "description": "预览视图",
   "main": "lib/preview-select.js",
@@ -11,9 +11,13 @@
     "build:ts": "rm -rf lib && tsc -w",
     "build:web": "rollup -c --watch"
   },
-  "keywords": ["preview"],
+  "keywords": [
+    "preview"
+  ],
   "author": "Ajanuw",
   "license": "MIT",
+  "homepage": "https://github.com/januwA/preview-select.js",
+  "repository": "januwA/preview-select.js",
   "devDependencies": {
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript": "^1.0.1",

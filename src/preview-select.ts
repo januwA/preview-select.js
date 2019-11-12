@@ -101,7 +101,7 @@ export class PreviewSelect {
     PreviewSelect.mask = new Mask();
     const self = this;
     PreviewSelect.mask.closeEventListener(() => {
-      if (self.curent) self.curent.resize();
+      if (self.curent) self.curent.reset();
     });
 
     for (const node of this.nodes) {
@@ -134,7 +134,7 @@ class PreviewNode {
 
   private handle() {
     if (this.isOpen) {
-      this.resize();
+      this.reset();
       PreviewSelect.mask.hide();
     } else {
       this.animeted();
@@ -147,7 +147,7 @@ class PreviewNode {
     this.startCB = fn;
   }
 
-  resize() {
+  reset() {
     this.isOpen = false;
     const { position, zIndex, ..._oldProp } = this.oldProp;
 
@@ -174,13 +174,18 @@ class PreviewNode {
     target.style.zIndex = PreviewNode.zIndex.toString();
     let x = width / 2 - w / 2 - target.offsetLeft + window.scrollX;
     let y = height / 2 - h / 2 - target.offsetTop + window.scrollY;
+    target.style.transform = `translate(${x}px , ${y}px )`;
+    if (PreviewSelect.toStyle) {
+      // 避免[transform]属性的冲突
+      const { transform, ..._toStyle } = PreviewSelect.toStyle;
+      console.log(_toStyle.width);
 
-    // 避免[transform]属性的冲突
-    const { transform, ..._toStyle } = PreviewSelect.toStyle;
+      target.style.cssText += _toStyle.cssText;
+      target.style.transform += transform;
 
-    target.style.cssText += _toStyle.cssText;
-
-    target.style.transform = `translate(${x}px , ${y}px )` + transform;
+      // TODO: 处理宽度问题
+      target.style.width = _toStyle.width;
+    }
 
     this.isOpen = true;
   }
