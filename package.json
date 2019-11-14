@@ -1,6 +1,6 @@
 {
   "name": "ajanuw-preview-select.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "预览视图",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",

@@ -99,8 +99,19 @@
           .defaultView.getComputedStyle(el, null)
           .getPropertyValue(prop);
   }
-  function createCSSStyleDeclaration() {
-      return document.createElement("div").style;
+  function createCSSStyleDeclaration(style) {
+      const div = document.createElement("div");
+      let cssText = "";
+      if (style) {
+          for (const key in style) {
+              if (key in div.style) {
+                  const value = style[key];
+                  cssText += `${key}: ${value}; `;
+              }
+          }
+      }
+      div.style.cssText = cssText;
+      return div.style;
   }
 
   class PreviewNode {
@@ -130,7 +141,6 @@
           this.previewEvent = fn;
       }
       reset() {
-          this.isOpen = false;
           const [oldPosition, oldZIndex, oldTransition] = [
               this.oldProp.removeProperty("position"),
               this.oldProp.removeProperty("zIndex"),
@@ -142,13 +152,16 @@
               this.node.style.transition
           ];
           this.node.style.cssText = this.oldProp.cssText;
+          this.node.style.transition = Currenttransition;
           this.node.style.position = currentPosition;
           this.node.style.zIndex = currentZIndex;
-          this.node.style.transition = Currenttransition;
           setTimeout(() => {
-              this.node.style.position = oldPosition;
+              if (oldPosition.trim() === "static") {
+                  this.node.style.position = oldPosition;
+              }
               this.node.style.zIndex = oldZIndex;
               this.node.style.transition = oldTransition;
+              this.isOpen = false;
           }, this.duration);
       }
       preview() {
@@ -157,7 +170,9 @@
           const target = this.node;
           this.oldProp.cssText = target.style.cssText;
           target.style.transition = this.transition;
-          target.style.position = "relative";
+          if (getPV(target, "position") === "static") {
+              target.style.position = "relative";
+          }
           target.style.zIndex = PreviewNode.zIndex.toString();
           const width = window.innerWidth;
           const height = window.innerHeight;
@@ -165,16 +180,26 @@
           const h = parseFloat(getPV(target, "height"));
           let x = width / 2 - w / 2 - target.offsetLeft + window.scrollX;
           let y = height / 2 - h / 2 - target.offsetTop + window.scrollY;
-          target.style.transform = `translate(${x}px , ${y}px )`;
           if (PreviewSelect.toStyle) {
               for (const key in PreviewSelect.toStyle) {
-                  const value = PreviewSelect.toStyle[key].toString();
-                  // 避免[transform]属性的冲突
-                  if (key === "transform")
-                      target.style[key] += value;
-                  else
-                      target.style[key] = value;
+                  // 过滤掉key为number的字段和不可读的字段
+                  const _isNaN = isNaN(parseInt(key));
+                  if (_isNaN && Object.getOwnPropertyDescriptor(target.style, key)) {
+                      const value = PreviewSelect.toStyle[key];
+                      if (value) {
+                          // transform是多参数的属性，避免冲突内部动画
+                          if (key === "transform") {
+                              target.style[key] = `translate(${x}px , ${y}px) ${PreviewSelect.toStyle[key]}`;
+                          }
+                          else {
+                              target.style[key] = PreviewSelect.toStyle[key];
+                          }
+                      }
+                  }
               }
+          }
+          else {
+              target.style.transform = `translate(${x}px , ${y}px)`;
           }
           this.isOpen = true;
       }
@@ -214,6 +239,7 @@
               });
           }
       }
+      // public to(style: { [key: string]: string }): PreviewSelect {
       to(style) {
           PreviewSelect.toStyle = style;
           return this;

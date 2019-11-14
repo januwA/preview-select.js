@@ -8,6 +8,9 @@ interface PreviewSelectOptions {
 }
 export declare class PreviewSelect {
     static mask: Mask;
+    /**
+     * ! 无法获取cssText属性
+     */
     static toStyle: CSSStyleDeclaration;
     /**
      * * 动画的持续时间, 毫秒为单位

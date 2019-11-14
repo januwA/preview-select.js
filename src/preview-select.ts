@@ -1,5 +1,6 @@
 import { Mask } from "./mask";
 import { PreviewNode } from "./preview-node";
+import { createCSSStyleDeclaration } from "./utils";
 
 interface PreviewSelectOptions {
   select: string;
@@ -11,6 +12,9 @@ interface PreviewSelectOptions {
 export class PreviewSelect {
   static mask: Mask;
 
+  /**
+   * ! 无法获取cssText属性
+   */
   static toStyle: CSSStyleDeclaration;
 
   /**
@@ -68,6 +72,7 @@ export class PreviewSelect {
     }
   }
 
+  // public to(style: { [key: string]: string }): PreviewSelect {
   public to(style: CSSStyleDeclaration): PreviewSelect {
     PreviewSelect.toStyle = style;
     return this;
