@@ -19,13 +19,6 @@ new PreviewSelect({
 
 ## Used in browser
 ```html
-<style>
-  .img {
-    width: 300px;
-    transition: all 1s;
-  }
-</style>
-
 <img src="https://i.loli.net/2019/11/07/TvjyJgGObWcBLAN.jpg" />
 
 <script src="../dist/preview-select.js"></script>
