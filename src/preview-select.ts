@@ -58,11 +58,11 @@ export class PreviewSelect {
     });
 
     for (const node of this.nodes) {
-      node.style.transitionProperty = "all";
-      node.style.transitionDuration = `${this.duration}ms`;
-      node.style.transitionTimingFunction = this.curve;
-      node.style.transitionDelay = "0s";
-      new PreviewNode(node, this.duration).previewEventListener(node => {
+      new PreviewNode(
+        node,
+        this.duration,
+        `all ${this.duration}ms ${this.curve} 0s`
+      ).previewEventListener(node => {
         this.curent = node;
       });
     }

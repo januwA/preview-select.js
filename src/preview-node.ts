@@ -14,7 +14,11 @@ export class PreviewNode {
   private isOpen: boolean = false;
   private oldProp: CSSStyleDeclaration;
 
-  constructor(public node: HTMLElement, public duration: number) {
+  constructor(
+    public node: HTMLElement,
+    public duration: number,
+    private transition: string
+  ) {
     node.addEventListener("click", () => this.handle());
     this.oldProp = createCSSStyleDeclaration();
   }
@@ -40,21 +44,25 @@ export class PreviewNode {
 
   reset() {
     this.isOpen = false;
-    const [oldPosition, oldZIndex] = [
+    const [oldPosition, oldZIndex, oldTransition] = [
       this.oldProp.removeProperty("position"),
-      this.oldProp.removeProperty("zIndex")
+      this.oldProp.removeProperty("zIndex"),
+      this.oldProp.removeProperty("transition")
     ];
-    const [currentPosition, currentZIndex] = [
+    const [currentPosition, currentZIndex, Currenttransition] = [
       this.node.style.position,
-      this.node.style.zIndex
+      this.node.style.zIndex,
+      this.node.style.transition
     ];
     this.node.style.cssText = this.oldProp.cssText;
     this.node.style.position = currentPosition;
     this.node.style.zIndex = currentZIndex;
+    this.node.style.transition = Currenttransition;
 
     setTimeout(() => {
       this.node.style.position = oldPosition;
       this.node.style.zIndex = oldZIndex;
+      this.node.style.transition = oldTransition;
       setBodyOverflowHidden(false);
     }, this.duration);
   }
@@ -62,6 +70,8 @@ export class PreviewNode {
     if (this.previewEvent) this.previewEvent(this);
     const target = this.node;
     this.oldProp.cssText = target.style.cssText;
+
+    target.style.transition = this.transition;
 
     target.style.position = "relative";
     target.style.zIndex = PreviewNode.zIndex.toString();

@@ -4,10 +4,11 @@ interface PreviewEvent {
 export declare class PreviewNode {
     node: HTMLElement;
     duration: number;
+    private transition;
     static zIndex: number;
     private isOpen;
     private oldProp;
-    constructor(node: HTMLElement, duration: number);
+    constructor(node: HTMLElement, duration: number, transition: string);
     private handle;
     private previewEvent;
     /**

@@ -93,7 +93,6 @@
    * * 遮罩层的z-index
    */
   Mask.zIndex = 1300;
-  //# sourceMappingURL=mask.js.map
 
   function getPV(el, prop) {
       return document
@@ -103,12 +102,12 @@
   function createCSSStyleDeclaration() {
       return document.createElement("div").style;
   }
-  //# sourceMappingURL=utils.js.map
 
   class PreviewNode {
-      constructor(node, duration) {
+      constructor(node, duration, transition) {
           this.node = node;
           this.duration = duration;
+          this.transition = transition;
           this.isOpen = false;
           node.addEventListener("click", () => this.handle());
           this.oldProp = createCSSStyleDeclaration();
@@ -132,20 +131,24 @@
       }
       reset() {
           this.isOpen = false;
-          const [oldPosition, oldZIndex] = [
+          const [oldPosition, oldZIndex, oldTransition] = [
               this.oldProp.removeProperty("position"),
-              this.oldProp.removeProperty("zIndex")
+              this.oldProp.removeProperty("zIndex"),
+              this.oldProp.removeProperty("transition")
           ];
-          const [currentPosition, currentZIndex] = [
+          const [currentPosition, currentZIndex, Currenttransition] = [
               this.node.style.position,
-              this.node.style.zIndex
+              this.node.style.zIndex,
+              this.node.style.transition
           ];
           this.node.style.cssText = this.oldProp.cssText;
           this.node.style.position = currentPosition;
           this.node.style.zIndex = currentZIndex;
+          this.node.style.transition = Currenttransition;
           setTimeout(() => {
               this.node.style.position = oldPosition;
               this.node.style.zIndex = oldZIndex;
+              this.node.style.transition = oldTransition;
           }, this.duration);
       }
       preview() {
@@ -153,6 +156,7 @@
               this.previewEvent(this);
           const target = this.node;
           this.oldProp.cssText = target.style.cssText;
+          target.style.transition = this.transition;
           target.style.position = "relative";
           target.style.zIndex = PreviewNode.zIndex.toString();
           const width = window.innerWidth;
@@ -176,7 +180,6 @@
       }
   }
   PreviewNode.zIndex = Mask.zIndex + 1;
-  //# sourceMappingURL=preview-node.js.map
 
   class PreviewSelect {
       constructor({ select, duration, curve, mask = new Mask({}) }) {
@@ -206,11 +209,7 @@
                   self.curent.reset();
           });
           for (const node of this.nodes) {
-              node.style.transitionProperty = "all";
-              node.style.transitionDuration = `${this.duration}ms`;
-              node.style.transitionTimingFunction = this.curve;
-              node.style.transitionDelay = "0s";
-              new PreviewNode(node, this.duration).previewEventListener(node => {
+              new PreviewNode(node, this.duration, `all ${this.duration}ms ${this.curve} 0s`).previewEventListener(node => {
                   this.curent = node;
               });
           }
@@ -220,7 +219,6 @@
           return this;
       }
   }
-  //# sourceMappingURL=preview-select.js.map
 
   exports.Mask = Mask;
   exports.PreviewSelect = PreviewSelect;

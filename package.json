@@ -8,6 +8,7 @@
     "example": "example"
   },
   "scripts": {
+    "build": "rm -rf lib && tsc && rollup -c",
     "build:ts": "rm -rf lib && tsc -w",
     "build:web": "rollup -c --watch"
   },
