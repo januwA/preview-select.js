@@ -1,9 +1,9 @@
 {
-  "name": "ajanuw-preview-select",
+  "name": "ajanuw-preview-select.js",
   "version": "0.1.0",
   "description": "预览视图",
-  "main": "lib/preview-select.js",
-  "types": "lib/preview-select.d.ts",
+  "main": "lib/main.js",
+  "types": "lib/main.d.ts",
   "directories": {
     "example": "example"
   },
@@ -12,6 +12,8 @@
     "build:web": "rollup -c --watch"
   },
   "keywords": [
+    "ajanuw-preview-select",
+    "ajanuw-preview-select.js",
     "preview"
   ],
   "author": "Ajanuw",

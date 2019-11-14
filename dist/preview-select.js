@@ -1,191 +1,231 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = global || self, factory(global.previewSelect = {}));
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global.previewSelect = {}));
 }(this, (function (exports) { 'use strict';
 
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-
-    function __rest(s, e) {
-        var t = {};
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-            t[p] = s[p];
-        if (s != null && typeof Object.getOwnPropertySymbols === "function")
-            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-                if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                    t[p[i]] = s[p[i]];
-            }
-        return t;
-    }
-
-    function getPV(el, prop) {
-        return document
-            .defaultView.getComputedStyle(el, null)
-            .getPropertyValue(prop);
-    }
-    class Mask {
-        constructor() {
-            this.isHide = true;
-            this.setup();
-        }
-        setup() {
-            this.div = document.createElement("div");
-            this.div.style.cssText = `
+  class Mask {
+      constructor(options) {
+          /**
+           * * Maks的dom节点
+           */
+          this.div = document.createElement("div");
+          /**
+           * * 是否为打开状态
+           */
+          this.isOpen = false;
+          if (options) {
+              const { duration, background } = options;
+              this.duration = duration;
+              this.background = background;
+          }
+          if (!this.background)
+              this.background = "rgba(0, 0, 0, .5)";
+          this.setup();
+      }
+      setup() {
+          this.div.style.cssText = `
         position: fixed;
         left: 0;
         top: 0;
         right: 0;
         bottom: 0;
-        width: 0px;
         height: 100vh;
         overflow: hidden;
-        background: rgba(0, 0, 0, 0.3);
+        background: ${this.background};
         z-index: ${Mask.zIndex};
         transition: opacity 1s ease 0s;
-    `;
-            this.hide();
-            document.body.append(this.div);
-            this.div.addEventListener("click", () => this.toggle());
-        }
-        hide() {
-            this.isHide = true;
-            this.div.style["opacity"] = "0";
-            setTimeout(() => {
-                this.div.style["width"] = "0px";
-                document.body.style["overflow"] = "auto";
-            }, 1000);
-            if (this.closeEvent)
-                this.closeEvent();
-        }
-        open() {
-            document.body.style["overflow"] = "hidden";
-            this.isHide = false;
-            this.div.style["opacity"] = "1";
-            this.div.style["width"] = "100vw";
-            if (this.openEvent)
-                this.openEvent();
-        }
-        toggle() {
-            if (this.isHide) {
-                this.open();
-            }
-            else {
-                this.hide();
-            }
-        }
-        closeEventListener(fn) {
-            if (fn) {
-                this.closeEvent = fn;
-            }
-        }
-        openEventListener(fn) {
-            if (fn) {
-                this.openEvent = fn;
-            }
-        }
-    }
-    Mask.zIndex = 1300;
-    class PreviewSelect {
-        constructor({ select }) {
-            this.nodes = Array.from(document.querySelectorAll(select));
-            this.setup();
-        }
-        setup() {
-            PreviewSelect.mask = new Mask();
-            const self = this;
-            PreviewSelect.mask.closeEventListener(() => {
-                if (self.curent)
-                    self.curent.reset();
-            });
-            for (const node of this.nodes) {
-                new PreviewNode(node).start(node => {
-                    this.curent = node;
-                });
-            }
-        }
-        to(style) {
-            let div = document.createElement("div");
-            for (const key in style) {
-                const element = style[key];
-                div.style[key] = element.toString();
-            }
-            PreviewSelect.toStyle = div.style;
-            return this;
-        }
-    }
-    class PreviewNode {
-        constructor(node) {
-            this.node = node;
-            this.isOpen = false;
-            node.addEventListener("click", () => this.handle());
-            this.oldProp = document.createElement("div").style;
-        }
-        handle() {
-            if (this.isOpen) {
-                this.reset();
-                PreviewSelect.mask.hide();
-            }
-            else {
-                this.animeted();
-                PreviewSelect.mask.open();
-            }
-        }
-        start(fn) {
-            this.startCB = fn;
-        }
-        reset() {
-            this.isOpen = false;
-            const _a = this.oldProp, { position, zIndex } = _a, _oldProp = __rest(_a, ["position", "zIndex"]);
-            this.node.style.cssText = _oldProp.cssText;
-            setTimeout(() => {
-                this.node.style.position = position;
-                this.node.style.zIndex = zIndex;
-            }, 1000);
-        }
-        animeted() {
-            if (this.startCB)
-                this.startCB(this);
-            const target = this.node;
-            const w = parseFloat(getPV(target, "width"));
-            const h = parseFloat(getPV(target, "height"));
-            this.oldProp.cssText = target.style.cssText;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            target.style.position = "relative";
-            target.style.zIndex = PreviewNode.zIndex.toString();
-            let x = width / 2 - w / 2 - target.offsetLeft + window.scrollX;
-            let y = height / 2 - h / 2 - target.offsetTop + window.scrollY;
-            target.style.transform = `translate(${x}px , ${y}px )`;
-            if (PreviewSelect.toStyle) {
-                // 避免[transform]属性的冲突
-                const _a = PreviewSelect.toStyle, { transform } = _a, _toStyle = __rest(_a, ["transform"]);
-                console.log(_toStyle.width);
-                target.style.cssText += _toStyle.cssText;
-                target.style.transform += transform;
-                // TODO: 处理宽度问题
-                target.style.width = _toStyle.width;
-            }
-            this.isOpen = true;
-        }
-    }
-    PreviewNode.zIndex = Mask.zIndex + 1;
+  `;
+          this.hide();
+          document.body.append(this.div);
+          this.div.addEventListener("click", () => this.toggle());
+      }
+      /**
+       * * 显示mask
+       */
+      hide() {
+          this.isOpen = false;
+          this.div.style.opacity = "0";
+          setTimeout(() => {
+              this.div.style.width = "0px";
+          }, this.duration);
+          if (this.closeEvent)
+              this.closeEvent();
+      }
+      /**
+       * * 隐藏mask
+       */
+      open() {
+          this.isOpen = true;
+          this.div.style.width = "100%";
+          this.div.style.opacity = "1";
+          if (this.openEvent)
+              this.openEvent();
+      }
+      toggle() {
+          if (!this.isOpen) {
+              this.open();
+          }
+          else {
+              this.hide();
+          }
+      }
+      /**
+       * * 监听mask的关闭事件
+       * @param fn
+       */
+      closeEventListener(fn) {
+          if (fn) {
+              this.closeEvent = fn;
+          }
+      }
+      /**
+       * * 监听mask的打开事件
+       * @param fn
+       */
+      openEventListener(fn) {
+          if (fn) {
+              this.openEvent = fn;
+          }
+      }
+  }
+  /**
+   * * 遮罩层的z-index
+   */
+  Mask.zIndex = 1300;
+  //# sourceMappingURL=mask.js.map
 
-    exports.PreviewSelect = PreviewSelect;
+  function getPV(el, prop) {
+      return document
+          .defaultView.getComputedStyle(el, null)
+          .getPropertyValue(prop);
+  }
+  function createCSSStyleDeclaration() {
+      return document.createElement("div").style;
+  }
+  //# sourceMappingURL=utils.js.map
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+  class PreviewNode {
+      constructor(node, duration) {
+          this.node = node;
+          this.duration = duration;
+          this.isOpen = false;
+          node.addEventListener("click", () => this.handle());
+          this.oldProp = createCSSStyleDeclaration();
+      }
+      handle() {
+          if (this.isOpen) {
+              this.reset();
+              PreviewSelect.mask.hide();
+          }
+          else {
+              this.preview();
+              PreviewSelect.mask.open();
+          }
+      }
+      /**
+       * 开始执行动画时的监听事件
+       * @param fn
+       */
+      previewEventListener(fn) {
+          this.previewEvent = fn;
+      }
+      reset() {
+          this.isOpen = false;
+          const [oldPosition, oldZIndex] = [
+              this.oldProp.removeProperty("position"),
+              this.oldProp.removeProperty("zIndex")
+          ];
+          const [currentPosition, currentZIndex] = [
+              this.node.style.position,
+              this.node.style.zIndex
+          ];
+          this.node.style.cssText = this.oldProp.cssText;
+          this.node.style.position = currentPosition;
+          this.node.style.zIndex = currentZIndex;
+          setTimeout(() => {
+              this.node.style.position = oldPosition;
+              this.node.style.zIndex = oldZIndex;
+          }, this.duration);
+      }
+      preview() {
+          if (this.previewEvent)
+              this.previewEvent(this);
+          const target = this.node;
+          this.oldProp.cssText = target.style.cssText;
+          target.style.position = "relative";
+          target.style.zIndex = PreviewNode.zIndex.toString();
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          const w = parseFloat(getPV(target, "width"));
+          const h = parseFloat(getPV(target, "height"));
+          let x = width / 2 - w / 2 - target.offsetLeft + window.scrollX;
+          let y = height / 2 - h / 2 - target.offsetTop + window.scrollY;
+          target.style.transform = `translate(${x}px , ${y}px )`;
+          if (PreviewSelect.toStyle) {
+              for (const key in PreviewSelect.toStyle) {
+                  const value = PreviewSelect.toStyle[key].toString();
+                  // 避免[transform]属性的冲突
+                  if (key === "transform")
+                      target.style[key] += value;
+                  else
+                      target.style[key] = value;
+              }
+          }
+          this.isOpen = true;
+      }
+  }
+  PreviewNode.zIndex = Mask.zIndex + 1;
+  //# sourceMappingURL=preview-node.js.map
+
+  class PreviewSelect {
+      constructor({ select, duration, curve, mask = new Mask({}) }) {
+          /**
+           * * 动画的持续时间, 毫秒为单位
+           * * default [1000]
+           */
+          this.duration = 1000;
+          /**
+           * * 动画曲线
+           * * default [ease]
+           */
+          this.curve = "ease";
+          if (duration)
+              this.duration = duration;
+          if (curve)
+              this.curve = curve;
+          this.nodes = Array.from(document.querySelectorAll(select));
+          mask.duration = duration;
+          PreviewSelect.mask = mask;
+          this.setup();
+      }
+      setup() {
+          const self = this;
+          PreviewSelect.mask.closeEventListener(() => {
+              if (self.curent)
+                  self.curent.reset();
+          });
+          for (const node of this.nodes) {
+              node.style.transitionProperty = "all";
+              node.style.transitionDuration = `${this.duration}ms`;
+              node.style.transitionTimingFunction = this.curve;
+              node.style.transitionDelay = "0s";
+              new PreviewNode(node, this.duration).previewEventListener(node => {
+                  this.curent = node;
+              });
+          }
+      }
+      to(style) {
+          PreviewSelect.toStyle = style;
+          return this;
+      }
+  }
+  //# sourceMappingURL=preview-select.js.map
+
+  exports.Mask = Mask;
+  exports.PreviewSelect = PreviewSelect;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 //# sourceMappingURL=preview-select.js.map

@@ -1,42 +1,34 @@
-interface StartCB {
-    (node: PreviewNode): void;
-}
+import { Mask } from "./mask";
+import { PreviewNode } from "./preview-node";
 interface PreviewSelectOptions {
     select: string;
-}
-declare class Mask {
-    static zIndex: number;
-    isHide: boolean;
-    div: HTMLElement;
-    constructor();
-    setup(): void;
-    closeEvent: Function;
-    hide(): void;
-    openEvent: Function;
-    open(): void;
-    toggle(): void;
-    closeEventListener(fn: Function): void;
-    openEventListener(fn: Function): void;
+    curve?: string;
+    duration?: number;
+    mask?: Mask;
 }
 export declare class PreviewSelect {
     static mask: Mask;
     static toStyle: CSSStyleDeclaration;
+    /**
+     * * 动画的持续时间, 毫秒为单位
+     * * default [1000]
+     */
+    duration: number;
+    /**
+     * * 当前执行动画的元素
+     */
     curent: PreviewNode;
+    /**
+     * * 所有需要监听的元素
+     */
     nodes: HTMLElement[];
-    constructor({ select }: PreviewSelectOptions);
+    /**
+     * * 动画曲线
+     * * default [ease]
+     */
+    curve: string;
+    constructor({ select, duration, curve, mask }: PreviewSelectOptions);
     private setup;
     to(style: CSSStyleDeclaration): PreviewSelect;
-}
-declare class PreviewNode {
-    node: HTMLElement;
-    static zIndex: number;
-    private isOpen;
-    private oldProp;
-    constructor(node: HTMLElement);
-    private handle;
-    private startCB;
-    start(fn: StartCB): void;
-    resize(): void;
-    animeted(): void;
 }
 export {};
