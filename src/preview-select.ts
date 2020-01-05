@@ -26,7 +26,7 @@ export class PreviewSelect {
   /**
    * * 当前执行动画的元素
    */
-  public curent!: PreviewNode;
+  public curent?: PreviewNode | null = null;
 
   /**
    * * 所有需要监听的元素
@@ -58,7 +58,9 @@ export class PreviewSelect {
   private setup(): void {
     const self = this;
     PreviewSelect.mask.closeEventListener(() => {
-      if (self.curent) self.curent.reset();
+      if (self.curent) {
+        self.curent.reset();
+      }
     });
 
     for (const node of this.nodes) {

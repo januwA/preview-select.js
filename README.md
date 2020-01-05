@@ -1,5 +1,3 @@
-放大预览视图 [Example](https://januwa.github.io/preview-select.js/example/index.html)
-
 ## Install
 ```
 npm i ajanuw-preview-select.js

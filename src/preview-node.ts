@@ -11,7 +11,7 @@ interface PreviewEvent {
 }
 export class PreviewNode {
   static zIndex = Mask.zIndex + 1;
-  private isOpen: boolean = false;
+  isOpen: boolean = false;
   private oldProp: CSSStyleDeclaration;
 
   constructor(
@@ -70,45 +70,45 @@ export class PreviewNode {
   }
   preview() {
     if (this.previewEvent) this.previewEvent(this);
-    const target = this.node;
-    this.oldProp.cssText = target.style.cssText;
-    target.style.transition = this.transition;
+    this.oldProp.cssText = this.node.style.cssText;
+    this.node.style.transition = this.transition;
 
-    if (getPV(target, "position") === "static") {
-      target.style.position = "relative";
+    if (getPV(this.node, "position") === "static") {
+      this.node.style.position = "relative";
     }
-    target.style.zIndex = PreviewNode.zIndex.toString();
+    this.node.style.zIndex = PreviewNode.zIndex.toString();
+    this.update();
+    // setBodyOverflowHidden(true);
+    this.isOpen = true;
+  }
 
+  update() {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const w = parseFloat(getPV(target, "width"));
-    const h = parseFloat(getPV(target, "height"));
-    let x = width / 2 - w / 2 - target.offsetLeft + window.scrollX;
-    let y = height / 2 - h / 2 - target.offsetTop + window.scrollY;
-
+    const w = parseFloat(getPV(this.node, "width"));
+    const h = parseFloat(getPV(this.node, "height"));
+    let x = width / 2 - w / 2 - this.node.offsetLeft + window.scrollX;
+    let y = height / 2 - h / 2 - this.node.offsetTop + window.scrollY;
     if (PreviewSelect.toStyle) {
       for (const key in PreviewSelect.toStyle) {
-
         // 过滤掉key为number的字段和不可读的字段
         const _isNaN = isNaN(parseInt(key));
-        if (_isNaN && Object.getOwnPropertyDescriptor(target.style, key)) {
+        if (_isNaN && Object.getOwnPropertyDescriptor(this.node.style, key)) {
           const value = PreviewSelect.toStyle[key];
           if (value) {
             // transform是多参数的属性，避免冲突内部动画
             if (key === "transform") {
-              target.style[
+              this.node.style[
                 key
               ] = `translate(${x}px , ${y}px) ${PreviewSelect.toStyle[key]}`;
             } else {
-              target.style[key] = PreviewSelect.toStyle[key];
-            }
+              this.node.style[key] = PreviewSelect.toStyle[key];
+            } this.node
           }
         }
       }
     } else {
-      target.style.transform = `translate(${x}px , ${y}px)`;
+      this.node.style.transform = `translate(${x}px , ${y}px)`;
     }
-    setBodyOverflowHidden(true);
-    this.isOpen = true;
   }
 }
