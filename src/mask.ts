@@ -29,7 +29,7 @@ export class Mask {
    */
   public background?: string;
 
-  constructor(options: MaskOptions) {
+  constructor(options?: MaskOptions) {
     if (options) {
       const { duration, background } = options;
       this.duration = duration;

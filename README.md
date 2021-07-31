@@ -31,3 +31,5 @@ new PreviewSelect({
 });
 </script>
 ```
+
+- [example](https://januwa.github.io/preview-select.js/dist/index.html)

@@ -39,38 +39,27 @@ export class PreviewSelect {
    */
   public curve: string = "ease";
 
-  constructor({
-    select,
-    duration,
-    curve,
-    mask = new Mask({})
-  }: PreviewSelectOptions) {
-    if (duration) this.duration = duration;
-    if (curve) this.curve = curve;
+  constructor(opt: PreviewSelectOptions) {
+    this.duration = opt.duration ?? 1000;
+    this.curve = opt.curve ?? "ease";
     this.nodes = Array.from<HTMLElement>(
-      document.querySelectorAll<HTMLElement>(select)
+      document.querySelectorAll<HTMLElement>(opt.select)
     );
-    mask.duration = duration;
-    PreviewSelect.mask = mask;
+    PreviewSelect.mask = opt.mask ?? new Mask();
+    PreviewSelect.mask.duration = opt.duration ?? 0;
     this.setup();
   }
 
   private setup(): void {
     const self = this;
-    PreviewSelect.mask.closeEventListener(() => {
-      if (self.curent) {
-        self.curent.reset();
-      }
-    });
+    PreviewSelect.mask.closeEventListener(() => self.curent?.reset());
 
     for (const node of this.nodes) {
       new PreviewNode(
         node,
         this.duration,
         `all ${this.duration}ms ${this.curve} 0s`
-      ).previewEventListener(node => {
-        this.curent = node;
-      });
+      ).previewEventListener((node) => (this.curent = node));
     }
   }
 

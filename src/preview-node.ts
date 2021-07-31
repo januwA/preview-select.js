@@ -2,7 +2,7 @@ import { Mask } from "./mask";
 import {
   createCSSStyleDeclaration,
   setBodyOverflowHidden,
-  getPV
+  getPV,
 } from "./utils";
 import { PreviewSelect } from "./preview-select";
 
@@ -19,11 +19,11 @@ export class PreviewNode {
     public duration: number,
     private transition: string
   ) {
-    node.addEventListener("click", () => this.handle());
+    node.addEventListener("click", this.handle);
     this.oldProp = createCSSStyleDeclaration();
   }
 
-  private handle() {
+  private handle = () => {
     if (this.isOpen) {
       this.reset();
       PreviewSelect.mask.hide();
@@ -31,7 +31,7 @@ export class PreviewNode {
       this.preview();
       PreviewSelect.mask.open();
     }
-  }
+  };
 
   private previewEvent!: PreviewEvent;
   /**
@@ -46,12 +46,12 @@ export class PreviewNode {
     const [oldPosition, oldZIndex, oldTransition] = [
       this.oldProp.removeProperty("position"),
       this.oldProp.removeProperty("zIndex"),
-      this.oldProp.removeProperty("transition")
+      this.oldProp.removeProperty("transition"),
     ];
     const [currentPosition, currentZIndex, Currenttransition] = [
       this.node.style.position,
       this.node.style.zIndex,
-      this.node.style.transition
+      this.node.style.transition,
     ];
     this.node.style.cssText = this.oldProp.cssText;
     this.node.style.transition = Currenttransition;
@@ -103,7 +103,8 @@ export class PreviewNode {
               ] = `translate(${x}px , ${y}px) ${PreviewSelect.toStyle[key]}`;
             } else {
               this.node.style[key] = PreviewSelect.toStyle[key];
-            } this.node
+            }
+            this.node;
           }
         }
       }
